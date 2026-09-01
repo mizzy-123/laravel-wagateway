@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand-50: #ecfdf5;
+    --color-brand-100: #d1fae5;
+    --color-brand-200: #a7f3d0;
+    --color-brand-300: #6ee7b7;
+    --color-brand-400: #34d399;
+    --color-brand-500: #10b981;
+    --color-brand-600: #059669;
+    --color-brand-700: #047857;
+    --color-brand-800: #065f46;
+    --color-brand-900: #064e3b;
+
+    --color-wa: #25d366;
+    --color-wa-dark: #128c7e;
+    --color-wa-light: #dcf8c6;
+
+    --color-surface: #f8faf9;
+    --color-surface-card: #ffffff;
+    --color-border: #e2e8f0;
+}
+
+@layer base {
+    body {
+        @apply bg-surface text-slate-800 antialiased;
+    }
+}
+
+@layer utilities {
+    .gradient-brand {
+        background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-800) 100%);
+    }
+
+    .gradient-brand-soft {
+        background: linear-gradient(135deg, var(--color-brand-50) 0%, #f0fdf4 50%, #ecfdf5 100%);
+    }
+
+    .shadow-card {
+        box-shadow:
+            0 1px 3px 0 rgb(0 0 0 / 0.04),
+            0 1px 2px -1px rgb(0 0 0 / 0.04);
+    }
+
+    .shadow-card-hover {
+        box-shadow:
+            0 4px 6px -1px rgb(0 0 0 / 0.06),
+            0 2px 4px -2px rgb(0 0 0 / 0.06);
+    }
+}
