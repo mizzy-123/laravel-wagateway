@@ -58,6 +58,14 @@
             Template Pesan
         </x-dashboard.nav-link>
 
+        <x-dashboard.nav-link
+            :href="route('dashboard.send')"
+            :active="request()->routeIs('dashboard.send')"
+            icon="send"
+        >
+            Kirim Pesan
+        </x-dashboard.nav-link>
+
         <div class="my-4 border-t border-white/10"></div>
 
         <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-brand-300">Sistem</p>

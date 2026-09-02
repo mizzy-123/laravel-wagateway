@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SendMessageController;
 use App\Http\Controllers\WaDeviceController;
+use App\Http\Controllers\WaTemplateController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -22,11 +24,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/devices', [DashboardController::class, 'devices'])->name('devices');
         Route::get('/messages', [DashboardController::class, 'messages'])->name('messages');
         Route::get('/templates', [DashboardController::class, 'templates'])->name('templates');
+        Route::get('/send', [SendMessageController::class, 'index'])->name('send');
+        Route::post('/send/single', [SendMessageController::class, 'single'])->name('send.single');
+        Route::post('/send/blast', [SendMessageController::class, 'blast'])->name('send.blast');
 
         Route::post('/devices', [WaDeviceController::class, 'store'])->name('devices.store');
         Route::post('/devices/{device}/connect', [WaDeviceController::class, 'connect'])->name('devices.connect');
         Route::get('/devices/{device}/status', [WaDeviceController::class, 'status'])->name('devices.status');
         Route::post('/devices/{device}/disconnect', [WaDeviceController::class, 'disconnect'])->name('devices.disconnect');
         Route::delete('/devices/{device}', [WaDeviceController::class, 'destroy'])->name('devices.destroy');
+
+        Route::post('/templates', [WaTemplateController::class, 'store'])->name('templates.store');
+        Route::put('/templates/{template}', [WaTemplateController::class, 'update'])->name('templates.update');
+        Route::delete('/templates/{template}', [WaTemplateController::class, 'destroy'])->name('templates.destroy');
+        Route::get('/templates/{template}/preview', [WaTemplateController::class, 'preview'])->name('templates.preview');
     });
 });

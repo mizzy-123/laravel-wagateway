@@ -9,8 +9,20 @@ use RuntimeException;
 
 class WppConnectService
 {
-    public function blastMessage(string $session, array $phones, bool $consentConfirmed, string $message){
-        $response = $this->client()->post("/api/{$session}/wa-blast", [
+    public function sendMessage(string $session, string $token, string $phone, string $message, bool $isGroup = false, bool $isNewsletter = false, bool $isLid = false){
+        $response = $this->authorizedClient($this->normalizeToken($token))->post("/api/{$session}/send-message", [
+            'phone' => $phone,
+            'isGroup' => $isGroup,
+            'isNewsletter' => $isNewsletter,
+            'isLid' => $isLid,
+            'message' => $message
+        ]);
+
+        return $this->decode($response, 'Gagal mengirim pesan');
+    }
+
+    public function blastMessage(string $session, string $token, array $phones, bool $consentConfirmed, string $message){
+        $response = $this->authorizedClient($this->normalizeToken($token))->post("/api/{$session}/wa-blast", [
             'phones' => $phones,
             'message' => $message,
             'consentConfirmed' => $consentConfirmed

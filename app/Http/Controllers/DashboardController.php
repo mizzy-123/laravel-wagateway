@@ -83,43 +83,7 @@ class DashboardController extends Controller
     public function templates(): View
     {
         return view('dashboard.templates.index', [
-            'templates' => [
-                [
-                    'name' => 'Konfirmasi Janji Temu',
-                    'category' => 'Appointment',
-                    'status' => 'active',
-                    'usage' => 342,
-                    'updated_at' => '2 jam lalu',
-                ],
-                [
-                    'name' => 'Hasil Lab Tersedia',
-                    'category' => 'Laboratorium',
-                    'status' => 'active',
-                    'usage' => 218,
-                    'updated_at' => '1 hari lalu',
-                ],
-                [
-                    'name' => 'Pengingat Kontrol',
-                    'category' => 'Follow-up',
-                    'status' => 'active',
-                    'usage' => 156,
-                    'updated_at' => '3 hari lalu',
-                ],
-                [
-                    'name' => 'Info Antrian Poli',
-                    'category' => 'Informasi',
-                    'status' => 'draft',
-                    'usage' => 0,
-                    'updated_at' => '5 hari lalu',
-                ],
-                [
-                    'name' => 'Survei Kepuasan Pasien',
-                    'category' => 'Survey',
-                    'status' => 'active',
-                    'usage' => 89,
-                    'updated_at' => '1 minggu lalu',
-                ],
-            ],
+            'templates' => \App\Models\WaTemplate::query()->latest()->get(),
         ]);
     }
 
