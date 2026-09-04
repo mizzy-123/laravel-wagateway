@@ -1,6 +1,5 @@
 <?php
 
-use App\Services\WppConnectService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -26,9 +25,9 @@ Schedule::call(function () {
             name = EXCLUDED.name,
             updated_at = NOW()
     ");
-})->dailyAt('01:00')
-->withoutOverlapping()
-->runInBackground();;
+})->name('sync-appointments-patients')
+->dailyAt('01:00')
+->withoutOverlapping();
 
 Schedule::call(function () {
     DB::statement("
@@ -46,9 +45,9 @@ Schedule::call(function () {
         phone = EXCLUDED.phone,
         name = EXCLUDED.name,
         updated_at = NOW()");
-})->dailyAt('01:00')
-->withoutOverlapping()
-->runInBackground();;
+})->name('sync-appointments-doctors')
+->dailyAt('01:00')
+->withoutOverlapping();
 
 Schedule::call(function () {
     DB::statement("
@@ -67,6 +66,6 @@ Schedule::call(function () {
             name = EXCLUDED.name,
             updated_at = NOW()
     ");
-})->dailyAt('01:00')
-->withoutOverlapping()
-->runInBackground();
+})->name('sync-appointments-employees')
+->dailyAt('01:00')
+->withoutOverlapping();

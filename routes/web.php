@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/send', [SendMessageController::class, 'index'])->name('send');
         Route::post('/send/single', [SendMessageController::class, 'single'])->name('send.single');
         Route::post('/send/blast', [SendMessageController::class, 'blast'])->name('send.blast');
+        Route::get('/appointments/search', [SendMessageController::class, 'searchAppointments'])->name('appointments.search');
+        Route::get('/appointments/load-numbers', [SendMessageController::class, 'loadAppointmentNumbers'])->name('appointments.load-numbers');
 
         Route::post('/devices', [WaDeviceController::class, 'store'])->name('devices.store');
         Route::post('/devices/{device}/connect', [WaDeviceController::class, 'connect'])->name('devices.connect');
