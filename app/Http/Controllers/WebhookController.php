@@ -4,12 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\WaDevice;
 use App\Models\WaMessage;
+use Dedoc\Scramble\Attributes\Endpoint;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+#[Group('Webhooks', weight: 90)]
 class WebhookController extends Controller
 {
+    /**
+     * Terima event dari WPPConnect Server.
+     */
+    #[Endpoint(
+        operationId: 'whatsappWebhook',
+        title: 'WhatsApp webhook',
+        description: 'Endpoint callback untuk event session dan pesan dari WPPConnect. Dilindungi header/secret `WA_WEBHOOK_SECRET`.',
+    )]
     public function __invoke(Request $request): JsonResponse
     {
         if (! $this->isAuthorized($request)) {

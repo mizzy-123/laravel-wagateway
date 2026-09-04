@@ -11,6 +11,13 @@ class StoreWaTemplateRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (! $this->filled('status')) {
+            $this->merge(['status' => 'draft']);
+        }
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -19,7 +26,7 @@ class StoreWaTemplateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100'],
-            'body' => ['required', 'string'],
+            'body' => ['required', 'string', 'max:4096'],
             'status' => ['required', 'string', 'in:active,draft'],
         ];
     }

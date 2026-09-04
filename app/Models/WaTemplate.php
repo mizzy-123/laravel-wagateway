@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use Database\Factories\WaTemplateFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class WaTemplate extends Model
 {
+    /** @use HasFactory<WaTemplateFactory> */
+    use HasFactory;
+
     /**
      * @var list<string>
      */
@@ -16,6 +21,24 @@ class WaTemplate extends Model
         'status',
         'usage_count',
     ];
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'draft',
+        'usage_count' => 0,
+    ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'usage_count' => 'integer',
+        ];
+    }
 
     /**
      * Parse the template body by replacing {placeholder} with actual values.
@@ -56,7 +79,7 @@ class WaTemplate extends Model
 
         $result = [];
         foreach ($matches[1] as $placeholder) {
-            $result[$placeholder] = $examples[$placeholder] ?? '[' . $placeholder . ']';
+            $result[$placeholder] = $examples[$placeholder] ?? '['.$placeholder.']';
         }
 
         return $result;
