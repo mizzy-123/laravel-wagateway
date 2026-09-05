@@ -164,6 +164,53 @@ const initWaDevices = () => {
         });
     });
 
+    const markCopied = (button) => {
+        const icon = button.querySelector('[data-copy-icon]');
+        const check = button.querySelector('[data-copy-check]');
+        const label = button.dataset.copyLabel || 'Teks';
+
+        icon?.classList.add('hidden');
+        check?.classList.remove('hidden');
+        button.title = `${label} disalin`;
+        button.classList.add('text-brand-600');
+
+        window.setTimeout(() => {
+            icon?.classList.remove('hidden');
+            check?.classList.add('hidden');
+            button.title = `Salin ${label.toLowerCase()}`;
+            button.classList.remove('text-brand-600');
+        }, 1500);
+    };
+
+    devicesGrid.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-copy]');
+        if (!button || !devicesGrid.contains(button)) {
+            return;
+        }
+
+        const value = button.dataset.copy;
+        if (!value) {
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(value);
+            markCopied(button);
+        } catch {
+            // Fallback for environments without Clipboard API permission
+            const textarea = document.createElement('textarea');
+            textarea.value = value;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'absolute';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            markCopied(button);
+        }
+    });
+
     qrModal?.addEventListener('click', (event) => {
         if (event.target === qrModal) {
             stopPolling();

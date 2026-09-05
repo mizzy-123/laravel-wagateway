@@ -40,9 +40,9 @@
                 data-device-card
                 data-device-id="{{ $device->id }}"
             >
-                <div class="flex items-start justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="relative flex size-14 items-center justify-center rounded-2xl {{ $device->status === 'connected' ? 'bg-gradient-to-br from-wa to-wa-dark' : ($device->status === 'connecting' ? 'bg-amber-400' : 'bg-slate-200') }}">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex min-w-0 flex-1 items-center gap-4">
+                        <div class="relative flex size-14 shrink-0 items-center justify-center rounded-2xl {{ $device->status === 'connected' ? 'bg-gradient-to-br from-wa to-wa-dark' : ($device->status === 'connecting' ? 'bg-amber-400' : 'bg-slate-200') }}">
                             <svg class="size-7 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
                             </svg>
@@ -50,13 +50,64 @@
                                 <span class="absolute -bottom-0.5 -right-0.5 size-4 rounded-full border-2 border-white bg-wa"></span>
                             @endif
                         </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-900">{{ $device->name }}</h3>
-                            <p class="text-sm text-slate-500">{{ $device->phone ?? 'Belum terhubung' }}</p>
-                            <p class="mt-0.5 text-xs text-slate-400">Session: {{ $device->session }}</p>
+                        <div class="min-w-0">
+                            <h3 class="truncate font-semibold text-slate-900">{{ $device->name }}</h3>
+                            <p class="truncate text-sm text-slate-500">{{ $device->phone ?? 'Belum terhubung' }}</p>
                         </div>
                     </div>
-                    <x-dashboard.badge :status="$device->status" data-device-status />
+                    <x-dashboard.badge class="shrink-0" :status="$device->status" data-device-status />
+                </div>
+
+                <div class="mt-4 space-y-1.5">
+                    <div class="flex items-center gap-1.5 rounded-lg bg-slate-50 px-2 py-1.5">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-[10px] font-medium uppercase tracking-wide text-slate-400">Session</p>
+                            <p class="truncate font-mono text-xs text-slate-700" title="{{ $device->session }}">{{ $device->session }}</p>
+                        </div>
+                        <button
+                            type="button"
+                            class="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-white hover:text-brand-600"
+                            data-copy="{{ $device->session }}"
+                            data-copy-label="Session"
+                            title="Salin session"
+                            aria-label="Salin session"
+                        >
+                            <svg class="size-3.5" data-copy-icon fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                            </svg>
+                            <svg class="hidden size-3.5 text-brand-600" data-copy-check fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 rounded-lg bg-slate-50 px-2 py-1.5">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-[10px] font-medium uppercase tracking-wide text-slate-400">Token</p>
+                            @if ($device->token)
+                                <p class="truncate font-mono text-xs text-slate-700" title="{{ $device->token }}">{{ $device->token }}</p>
+                            @else
+                                <p class="text-xs italic text-slate-400">Belum ada</p>
+                            @endif
+                        </div>
+                        @if ($device->token)
+                            <button
+                                type="button"
+                                class="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-white hover:text-brand-600"
+                                data-copy="{{ $device->token }}"
+                                data-copy-label="Token"
+                                title="Salin token"
+                                aria-label="Salin token"
+                            >
+                                <svg class="size-3.5" data-copy-icon fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                                </svg>
+                                <svg class="hidden size-3.5 text-brand-600" data-copy-check fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                            </button>
+                        @endif
+                    </div>
                 </div>
 
                 <div class="mt-5 grid grid-cols-2 gap-3">

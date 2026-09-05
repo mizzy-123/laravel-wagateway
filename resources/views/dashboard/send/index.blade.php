@@ -341,14 +341,28 @@
             </div>
 
             <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-              <strong>Perhatian:</strong> Fitur blast mengirim pesan satu per satu ke setiap nomor. Pastikan perangkat WhatsApp terhubung dan tidak terblokir.
+              <strong>Perhatian:</strong> Blast diantrikan ke WPPConnect (Redis) dan diproses di background — tidak menunggu pengiriman satu per satu. Pastikan perangkat terhubung dan penerima telah memberikan persetujuan.
             </div>
+
+            <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-white px-4 py-3">
+              <input
+                type="checkbox"
+                name="consent_confirmed"
+                value="1"
+                required
+                class="mt-0.5 size-4 rounded border-border text-brand-600 focus:ring-brand-500/20"
+              >
+              <span class="text-sm text-slate-700">
+                Saya mengonfirmasi bahwa semua penerima telah menyetujui menerima pesan WhatsApp dari RS Roemani
+                <span class="text-red-500">*</span>
+              </span>
+            </label>
 
             <div class="flex justify-end pt-2">
               <button type="submit" {{ $devices->isEmpty() ? 'disabled' : '' }}
                 class="inline-flex items-center gap-2 rounded-xl bg-wa px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wa/90 disabled:cursor-not-allowed disabled:opacity-50">
                 <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0121.485 12 59.768 59.768 0 013.27 20.875L5.999 12zm0 0h7.5" /></svg>
-                Kirim Blast
+                Antrikan Blast
               </button>
             </div>
           </div>

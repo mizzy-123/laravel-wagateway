@@ -46,7 +46,7 @@ class SendMessageController extends Controller
         if ($q !== '') {
             $cleanDigits = preg_replace('/\D/', '', $q);
             $query->where(function ($sub) use ($q, $cleanDigits) {
-                $sub->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($q) . '%']);
+                $sub->whereRaw('LOWER(name) LIKE ?', ['%'.strtolower($q).'%']);
                 if ($cleanDigits !== '') {
                     $sub->orWhere('phone', 'LIKE', "%{$cleanDigits}%");
                 }
@@ -94,8 +94,9 @@ class SendMessageController extends Controller
             ->map(function ($phone) {
                 $digits = preg_replace('/\D/', '', (string) $phone);
                 if (str_starts_with($digits, '0')) {
-                    return '62' . substr($digits, 1);
+                    return '62'.substr($digits, 1);
                 }
+
                 return $digits;
             })
             ->filter(fn ($phone) => strlen($phone) >= 9)
@@ -129,14 +130,14 @@ class SendMessageController extends Controller
         // Normalize phone: strip non-digits, ensure starts with country code
         $phone = preg_replace('/\D/', '', $data['phone']);
         if (str_starts_with($phone, '0')) {
-            $phone = '62' . substr($phone, 1);
+            $phone = '62'.substr($phone, 1);
         }
 
         try {
             $this->wppConnect->sendMessage(
                 session: $device->session,
                 token: $device->token ?? '',
-                phone: $phone . '@c.us',
+                phone: $phone.'@c.us',
                 message: $data['message'],
             );
 
@@ -156,12 +157,12 @@ class SendMessageController extends Controller
 
             return redirect()
                 ->route('dashboard.send')
-                ->with('success', 'Pesan berhasil dikirim ke ' . $phone . '.');
+                ->with('success', 'Pesan berhasil dikirim ke '.$phone.'.');
         } catch (RuntimeException $e) {
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'Gagal mengirim pesan: ' . $e->getMessage());
+                ->with('error', 'Gagal mengirim pesan: '.$e->getMessage());
         }
     }
 
@@ -171,13 +172,19 @@ class SendMessageController extends Controller
             'device_id' => ['required', 'exists:wa_devices,id'],
             'phones' => ['required', 'string'],
             'message' => ['required', 'string', 'max:4096'],
+            'consent_confirmed' => ['accepted'],
         ], [
             'device_id.required' => 'Pilih perangkat pengirim.',
             'phones.required' => 'Daftar nomor tujuan wajib diisi.',
             'message.required' => 'Isi pesan wajib diisi.',
+            'consent_confirmed.accepted' => 'Anda harus mengonfirmasi persetujuan penerima sebelum blast.',
         ]);
 
         $device = WaDevice::findOrFail($data['device_id']);
+
+        if (! $device->token) {
+            return redirect()->back()->withInput()->with('error', 'Perangkat belum memiliki token session. Hubungkan perangkat terlebih dahulu.');
+        }
 
         // Parse & normalize phone list (comma or newline separated)
         $rawPhones = preg_split('/[\s,]+/', $data['phones']);
@@ -186,55 +193,59 @@ class SendMessageController extends Controller
             ->filter()
             ->map(function ($p) {
                 if (str_starts_with($p, '0')) {
-                    return '62' . substr($p, 1);
+                    return '62'.substr($p, 1);
                 }
+
                 return $p;
             })
+            ->filter(fn ($p) => strlen($p) >= 9)
             ->unique()
             ->values()
-            ->toArray();
+            ->all();
 
-        if (empty($phones)) {
+        if ($phones === []) {
             return redirect()->back()->withInput()->with('error', 'Tidak ada nomor valid yang ditemukan.');
         }
 
-        $sent = 0;
-        $failed = 0;
-        $errors = [];
+        try {
+            $this->wppConnect->blastMessage(
+                session: $device->session,
+                token: $device->token,
+                phones: $phones,
+                consentConfirmed: true,
+                message: $data['message'],
+            );
 
-        foreach ($phones as $phone) {
-            try {
-                $this->wppConnect->sendMessage(
-                    session: $device->session,
-                    token: $device->token ?? '',
-                    phone: $phone . '@c.us',
-                    message: $data['message'],
-                );
+            $now = now();
+            $rows = array_map(fn (string $phone) => [
+                'wa_device_id' => $device->id,
+                'direction' => 'outbound',
+                'to_number' => $phone,
+                'body' => $data['message'],
+                'type' => 'chat',
+                'status' => 'queued',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ], $phones);
 
-                WaMessage::query()->create([
-                    'wa_device_id' => $device->id,
-                    'direction' => 'outbound',
-                    'to_number' => $phone,
-                    'body' => $data['message'],
-                    'type' => 'chat',
-                    'status' => 'sent',
-                ]);
-
-                $sent++;
-            } catch (RuntimeException $e) {
-                $failed++;
-                $errors[] = $phone . ': ' . $e->getMessage();
+            foreach (array_chunk($rows, 500) as $chunk) {
+                WaMessage::query()->insert($chunk);
             }
+
+            if ($request->filled('template_id')) {
+                WaTemplate::find($request->integer('template_id'))?->increment('usage_count', count($phones));
+            }
+
+            $count = count($phones);
+
+            return redirect()
+                ->route('dashboard.send')
+                ->with('success', "Blast berhasil diantrikan untuk {$count} nomor. Pengiriman diproses di background.");
+        } catch (RuntimeException $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Gagal mengantrikan blast: '.$e->getMessage());
         }
-
-        if ($request->filled('template_id')) {
-            WaTemplate::find($request->integer('template_id'))?->increment('usage_count', $sent);
-        }
-
-        $summary = "Blast selesai: {$sent} berhasil" . ($failed > 0 ? ", {$failed} gagal." : '.');
-
-        return redirect()
-            ->route('dashboard.send')
-            ->with($failed === 0 ? 'success' : 'warning', $summary);
     }
 }
