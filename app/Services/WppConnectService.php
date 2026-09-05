@@ -33,6 +33,46 @@ class WppConnectService
         return $this->decode($response, 'Gagal mengirim pesan blast');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function getBlastStatus(string $session, string $token, string $jobId): array
+    {
+        $response = $this->authorizedClient($this->normalizeToken($token))
+            ->get("/api/{$session}/wa-blast/{$jobId}");
+
+        return $this->decode($response, 'Gagal mengambil status blast.');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getBlastFailed(string $session, string $token, string $jobId): array
+    {
+        $response = $this->authorizedClient($this->normalizeToken($token))
+            ->get("/api/{$session}/wa-blast/{$jobId}/failed");
+
+        return $this->decode($response, 'Gagal mengambil daftar pesan gagal.');
+    }
+
+    /**
+     * @param  list<int>|null  $indexes
+     * @return array<string, mixed>
+     */
+    public function retryBlastFailed(string $session, string $token, string $jobId, ?array $indexes = null): array
+    {
+        $payload = [];
+
+        if ($indexes !== null && $indexes !== []) {
+            $payload['indexes'] = array_values(array_map('intval', $indexes));
+        }
+
+        $response = $this->authorizedClient($this->normalizeToken($token))
+            ->post("/api/{$session}/wa-blast/{$jobId}/retry-failed", $payload);
+
+        return $this->decode($response, 'Gagal retry pesan blast yang gagal.');
+    }
+
     public function generateToken(string $session): array
     {
         $response = $this->client()
@@ -106,12 +146,13 @@ class WppConnectService
      */
     private function decode(Response $response, string $fallbackMessage): array
     {
+        // 2xx termasuk 202 Accepted (wa-blast queued) dianggap sukses.
         if ($response->failed()) {
             $message = $response->json('message')
                 ?? $response->json('error')
                 ?? $fallbackMessage;
 
-            throw new RuntimeException($message);
+            throw new RuntimeException(is_string($message) ? $message : $fallbackMessage);
         }
 
         return $response->json() ?? [];

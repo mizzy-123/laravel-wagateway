@@ -66,6 +66,14 @@
             Kirim Pesan
         </x-dashboard.nav-link>
 
+        <x-dashboard.nav-link
+            :href="route('dashboard.blasts')"
+            :active="request()->routeIs('dashboard.blasts*')"
+            icon="blast"
+        >
+            Riwayat Blast
+        </x-dashboard.nav-link>
+
         <div class="my-4 border-t border-white/10"></div>
 
         <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-brand-300">Sistem</p>

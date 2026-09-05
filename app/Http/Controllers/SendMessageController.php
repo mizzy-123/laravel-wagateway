@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\WaBlastCampaign;
 use App\Models\WaDevice;
 use App\Models\WaMessage;
 use App\Models\WaTemplate;
@@ -208,13 +209,37 @@ class SendMessageController extends Controller
         }
 
         try {
-            $this->wppConnect->blastMessage(
+            $response = $this->wppConnect->blastMessage(
                 session: $device->session,
                 token: $device->token,
                 phones: $phones,
                 consentConfirmed: true,
                 message: $data['message'],
             );
+
+            $jobId = data_get($response, 'response.id') ?? data_get($response, 'id');
+
+            if (! is_string($jobId) || $jobId === '') {
+                throw new RuntimeException('Job ID blast tidak diterima dari WPPConnect.');
+            }
+
+            $campaignPayload = data_get($response, 'response', []);
+            if (! is_array($campaignPayload)) {
+                $campaignPayload = [];
+            }
+
+            $campaign = WaBlastCampaign::query()->create([
+                'wa_device_id' => $device->id,
+                'job_id' => $jobId,
+                'message' => $data['message'],
+                'status' => (string) ($campaignPayload['status'] ?? 'queued'),
+                'total' => (int) ($campaignPayload['total'] ?? count($phones)),
+                'queued' => (int) ($campaignPayload['queued'] ?? count($phones)),
+                'sent' => (int) ($campaignPayload['sent'] ?? 0),
+                'failed' => (int) ($campaignPayload['failed'] ?? 0),
+                'cancelled' => (int) ($campaignPayload['cancelled'] ?? 0),
+                'phones' => $phones,
+            ]);
 
             $now = now();
             $rows = array_map(fn (string $phone) => [
@@ -239,8 +264,8 @@ class SendMessageController extends Controller
             $count = count($phones);
 
             return redirect()
-                ->route('dashboard.send')
-                ->with('success', "Blast berhasil diantrikan untuk {$count} nomor. Pengiriman diproses di background.");
+                ->route('dashboard.blasts.show', $campaign)
+                ->with('success', "Blast berhasil diantrikan untuk {$count} nomor (Job ID: {$jobId}).");
         } catch (RuntimeException $e) {
             return redirect()
                 ->back()

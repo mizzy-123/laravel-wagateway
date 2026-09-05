@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SendMessageController;
+use App\Http\Controllers\WaBlastCampaignController;
 use App\Http\Controllers\WaDeviceController;
 use App\Http\Controllers\WaTemplateController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/send/blast', [SendMessageController::class, 'blast'])->name('send.blast');
         Route::get('/appointments/search', [SendMessageController::class, 'searchAppointments'])->name('appointments.search');
         Route::get('/appointments/load-numbers', [SendMessageController::class, 'loadAppointmentNumbers'])->name('appointments.load-numbers');
+
+        Route::get('/blasts', [WaBlastCampaignController::class, 'index'])->name('blasts');
+        Route::get('/blasts/{blast}', [WaBlastCampaignController::class, 'show'])->name('blasts.show');
+        Route::post('/blasts/{blast}/refresh', [WaBlastCampaignController::class, 'refresh'])->name('blasts.refresh');
+        Route::post('/blasts/{blast}/retry-failed', [WaBlastCampaignController::class, 'retryFailed'])->name('blasts.retry-failed');
+        Route::get('/blasts/{blast}/failed', [WaBlastCampaignController::class, 'failed'])->name('blasts.failed');
 
         Route::post('/devices', [WaDeviceController::class, 'store'])->name('devices.store');
         Route::post('/devices/{device}/connect', [WaDeviceController::class, 'connect'])->name('devices.connect');

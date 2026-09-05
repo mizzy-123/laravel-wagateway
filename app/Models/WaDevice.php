@@ -38,6 +38,11 @@ class WaDevice extends Model
         return $this->hasMany(WaMessage::class);
     }
 
+    public function blastCampaigns(): HasMany
+    {
+        return $this->hasMany(WaBlastCampaign::class);
+    }
+
     public function isConnected(): bool
     {
         return $this->status === 'connected';
