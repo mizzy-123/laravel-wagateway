@@ -1,4 +1,5 @@
 import './wa-devices.js';
+import './topbar.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');

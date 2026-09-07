@@ -3,7 +3,7 @@
     <div class="mb-6 overflow-hidden rounded-2xl gradient-brand p-6 text-white shadow-lg sm:p-8">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <p class="text-sm font-medium text-brand-200">Selamat datang kembali 👋</p>
+                <p class="text-sm font-medium text-brand-200">Selamat datang kembali</p>
                 <h2 class="mt-1 text-2xl font-bold sm:text-3xl">WhatsApp Gateway</h2>
                 <p class="mt-2 max-w-lg text-sm text-brand-100">
                     Pantau pengiriman pesan notifikasi pasien, status perangkat, dan performa gateway secara real-time.

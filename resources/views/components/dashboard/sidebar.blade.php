@@ -78,7 +78,11 @@
 
         <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-brand-300">Sistem</p>
 
-        <x-dashboard.nav-link href="#" icon="settings">
+        <x-dashboard.nav-link
+            :href="route('dashboard.settings')"
+            :active="request()->routeIs('dashboard.settings*')"
+            icon="settings"
+        >
             Pengaturan
         </x-dashboard.nav-link>
     </nav>

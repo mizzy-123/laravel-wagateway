@@ -3,6 +3,8 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SendMessageController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TopbarController;
 use App\Http\Controllers\WaBlastCampaignController;
 use App\Http\Controllers\WaDeviceController;
 use App\Http\Controllers\WaTemplateController;
@@ -47,5 +49,14 @@ Route::middleware('auth')->group(function () {
         Route::put('/templates/{template}', [WaTemplateController::class, 'update'])->name('templates.update');
         Route::delete('/templates/{template}', [WaTemplateController::class, 'destroy'])->name('templates.destroy');
         Route::get('/templates/{template}/preview', [WaTemplateController::class, 'preview'])->name('templates.preview');
+
+        Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+        Route::put('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile');
+        Route::put('/settings/whatsapp', [SettingsController::class, 'updateWhatsapp'])->name('settings.whatsapp');
+        Route::post('/settings/test-connection', [SettingsController::class, 'testConnection'])->name('settings.test-connection');
+
+        Route::get('/search', [TopbarController::class, 'search'])->name('search');
+        Route::get('/notifications', [TopbarController::class, 'notifications'])->name('notifications');
+        Route::post('/notifications/read', [TopbarController::class, 'markNotificationsRead'])->name('notifications.read');
     });
 });
